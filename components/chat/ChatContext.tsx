@@ -178,13 +178,13 @@ export const ChatContentProvider = ({ fileId, children }: Props) => {
         );
       }
     },
-    onError: (_, __, context) => {
-      setMessage(backupMessage.current);
-      utils.getFileMessages.setData(
-        { fileId },
-        { messages: context?.previousMessages ?? [] }
-      );
-    },
+    // onError: (_, __, context) => {
+    //   setMessage(backupMessage.current);
+    //   utils.getFileMessages.setData(
+    //     { fileId },
+    //     { messages: context?.previousMessages ?? [] }
+    //   );
+    // },
     onSettled: async () => {
       setIsLoading(false);
 
