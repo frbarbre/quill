@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
+
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { PineconeStore } from 'langchain/vectorstores/pinecone';
@@ -49,6 +50,7 @@ const onUploadComplete = async ({
       uploadStatus: 'PROCESSING',
     },
   });
+
   try {
     const response = await fetch(
       `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`
@@ -66,11 +68,11 @@ const onUploadComplete = async ({
     const { isSubscribed } = subscriptionPlan;
 
     const isProExceeded =
-      pagesAmt > PLANS.find((plan) => plan.name == 'Pro')!.pagesPerPdf;
+      pagesAmt > PLANS.find((plan) => plan.name === 'Pro')!.pagesPerPdf;
     const isFreeExceeded =
-      pagesAmt > PLANS.find((plan) => plan.name == 'Free')!.pagesPerPdf;
+      pagesAmt > PLANS.find((plan) => plan.name === 'Free')!.pagesPerPdf;
 
-    if ((isSubscribed && isProExceeded) || (!isSubscribed && !isFreeExceeded)) {
+    if ((isSubscribed && isProExceeded) || (!isSubscribed && isFreeExceeded)) {
       await db.file.update({
         data: {
           uploadStatus: 'FAILED',
@@ -80,6 +82,7 @@ const onUploadComplete = async ({
         },
       });
     }
+
     // vectorize and index entire document
     const pinecone = await getPineconeClient();
     const pineconeIndex = pinecone.Index('quill');
@@ -110,7 +113,6 @@ const onUploadComplete = async ({
         id: createdFile.id,
       },
     });
-    console.log(err);
   }
 };
 
