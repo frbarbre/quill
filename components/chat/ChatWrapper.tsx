@@ -8,12 +8,14 @@ import { ChevronLeft, Loader2, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
 import { ChatContentProvider } from './ChatContext';
+import { PLANS } from '@/config/stripe';
 
 interface ChatWrapperProps {
   fileId: string;
+  isSubscribed?: boolean;
 }
 
-const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
+const ChatWrapper = ({ fileId, isSubscribed }: ChatWrapperProps) => {
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery(
     {
       fileId,
@@ -64,7 +66,16 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
             <XCircle className="h-8 w-8 text-red-500" />
             <h3 className="font-semibold text-xl">Too many pages in PDF...</h3>
             <p className="text-zinc-500 text-sm">
-              Your <span className="font-bold">Free</span> plan supports up to 5
+              Your{' '}
+              <span className="font-bold">{isSubscribed ? 'Pro' : 'Free'}</span>{' '}
+              plan supports up to{' '}
+              {isSubscribed
+                ? PLANS.find(
+                    (p) => p.slug === 'pro'
+                  )?.pagesPerPdf.toLocaleString()
+                : PLANS.find(
+                    (p) => p.slug === 'free'
+                  )?.pagesPerPdf.toLocaleString()}{' '}
               pages per PDF.
             </p>
             <Link
